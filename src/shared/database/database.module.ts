@@ -1,0 +1,49 @@
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { DatabaseNeoBrustalismService } from './database-neo-brustalism.service';
+
+@Module({
+    imports: [
+        // Kết nối MySQL chính
+        TypeOrmModule.forRootAsync({
+            name: 'default', // Tên kết nối mặc định
+            imports: [ConfigModule],
+            useFactory: (configService: ConfigService) => ({
+                type: 'mysql',
+                host: configService.get('DB_HOST', 'localhost'),
+                port: configService.get('DB_PORT', 3306),
+                username: configService.get('DB_USERNAME', 'root'),
+                password: configService.get('DB_PASSWORD', ''),
+                database: configService.get('DB_NAME', 'nestjs_db'),
+                // entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+                synchronize: configService.get('NODE_ENV') !== 'production',
+                logging: configService.get('NODE_ENV') === 'development',
+                timezone: '+07:00',
+            }),
+            inject: [ConfigService],
+        }),
+
+        // Kết nối MySQL thứ hai
+        // TypeOrmModule.forRootAsync({
+        //     name: 'analytics',
+        //     imports: [ConfigModule],
+        //     useFactory: (configService: ConfigService) => ({
+        //         type: 'mysql',
+        //         host: configService.get('ANALYTICS_DB_HOST', 'localhost'),
+        //         port: configService.get('ANALYTICS_DB_PORT', 3306),
+        //         username: configService.get('ANALYTICS_DB_USERNAME', 'root'),
+        //         password: configService.get('ANALYTICS_DB_PASSWORD', ''),
+        //         database: configService.get('ANALYTICS_DB_NAME', 'analytics_db'),
+        //         entities: [__dirname + '/../**/*.analytics.entity{.ts,.js}'],
+        //         synchronize: configService.get('NODE_ENV') !== 'production',
+        //         logging: false,
+        //         timezone: '+07:00',
+        //     }),
+        //     inject: [ConfigService],
+        // }),
+    ],
+    providers: [DatabaseNeoBrustalismService],
+    exports: [DatabaseNeoBrustalismService],
+})
+export class DatabaseModule { }
