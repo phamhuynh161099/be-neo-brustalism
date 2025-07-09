@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Ip, Param, ParseIntPipe, Post, Put, Query } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { DatabaseNeoBrustalismService } from "src/shared/database/database-neo-brustalism.service";
 import { CreateUserDto, PaginationOptions, UpdateUserDto, UserFilter } from "./user.dto";
+import { UserAgent } from "src/shared/decorators/user-agent.decorator";
 
 @Controller('user')
 export class UserController {
@@ -62,6 +63,22 @@ export class UserController {
         return await this.userService.searchUsers(keyword, parseInt(limit));
     }
 
+    @Get('health')
+    async checkDatabaseHealth(@UserAgent() userAgent: string, @Ip() ip: string) {
+        const defaultDbStatus = await this.databaseService.checkConnection('default');
+
+        return {
+            databases: {
+                default: {
+                    status: defaultDbStatus ? 'connected' : 'disconnected',
+                    info: this.databaseService.getDatabaseInfo('default'),
+                },
+                userAgent,
+                ip,
+            },
+        };
+    }
+
     @Get(':id')
     async findById(@Param('id', ParseIntPipe) id: number) {
         return await this.userService.findById(id);
@@ -120,20 +137,5 @@ export class UserController {
         }
 
         return { valid: true, user };
-    }
-
-
-    @Get('health')
-    async checkDatabaseHealth() {
-        const defaultDbStatus = await this.databaseService.checkConnection('default');
-
-        return {
-            databases: {
-                default: {
-                    status: defaultDbStatus ? 'connected' : 'disconnected',
-                    info: this.databaseService.getDatabaseInfo('default'),
-                },
-            },
-        };
     }
 }
