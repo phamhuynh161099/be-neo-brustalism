@@ -16,8 +16,10 @@ import { Response } from 'express';
 import { MediasV2Service } from './media-v2.service';
 import { FileValidationInterceptor } from './file-validation.interceptor';
 import { FileExceptionFilter } from './file-exception.filter';
+import { IsPublic } from 'src/shared/decorators/auth.decorator';
 
 @Controller('medias-v2')
+@IsPublic()
 @UseFilters(FileExceptionFilter)
 export class MediasV2Controller {
     constructor(private readonly mediasV2Service: MediasV2Service) { }
