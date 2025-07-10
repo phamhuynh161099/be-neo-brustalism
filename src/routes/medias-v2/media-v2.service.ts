@@ -73,6 +73,15 @@ export class MediasV2Service {
             const folderAccount = '/admin';
             const fullPath = path.join(this.uploadPath, folderAccount, uniqueFilename);
 
+            /**
+             ** Kiểm tra xe thư mục đã tồn tại chưa, nếu chưa thì khởi tạo
+             */
+            const targetDirectory = path.join(this.uploadPath, folderAccount);
+            if (!fs.existsSync(targetDirectory)) {
+                fs.mkdirSync(targetDirectory, { recursive: true });
+            }
+            
+
             // Kiểm tra và xử lý file theo loại
             let processedBuffer = file.buffer;
 
