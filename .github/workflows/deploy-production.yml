@@ -41,6 +41,6 @@ jobs:
             docker image prune -f
             docker stop prod-be-neo-brustalism || true
             docker rm -f prod-be-neo-brustalism || true
-            docker run -itd -p 8333:8333 --name prod-be-neo-brustalism sakata1301/be-neo-brustalism:v0
+            # docker run -itd -p 8333:8333 --name prod-be-neo-brustalism sakata1301/be-neo-brustalism:v0
             # Nếu cần mount volume cho logs hoặc uploads:
-            # docker run -itd -p 8333:8333 -v volume_nestjs_logs:/app/logs -v volume_nestjs_uploads:/app/uploads --name prod-be-neo-brustalism sakata1301/be-neo-brustalism:v0
+            docker run -itd -p 8333:8333 -v volume_nestjs_logs:/app/logs -v volume_nestjs_uploads:/app/uploads --name prod-be-neo-brustalism sakata1301/be-neo-brustalism:v0
