@@ -10,21 +10,47 @@ import {
   Res,
   Delete,
   UseFilters,
+  Body,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { MediasService } from './medias.service';
 import { Response } from 'express';
 import { FileValidationInterceptor } from './file-validation.interceptor';
 import { FileExceptionFilter } from './file-exception.filter';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('medias')
+@ApiTags('Medias')
+@ApiBearerAuth('JWT-auth')
 @UseFilters(FileExceptionFilter)
 export class MediasController {
   constructor(private readonly mediasService: MediasService) { }
 
   @Post('upload/single')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+        folder: {
+          type: 'string',
+          description: 'folder muốn lưu trữ - demo'
+        },
+      },
+    },
+  })
   @UseInterceptors(FileInterceptor('file'), FileValidationInterceptor)
-  async uploadSingleFile(@UploadedFile() file: Express.Multer.File) {
+  async uploadSingleFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: {
+      folder: string
+    }
+  ) {
+    console.log('folder', body.folder)
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
@@ -38,6 +64,22 @@ export class MediasController {
   }
 
   @Post('upload/multiple')
+  @ApiOperation({ summary: 'Upload nhiều file' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
   @UseInterceptors(FilesInterceptor('files', 10), FileValidationInterceptor)
   async uploadMultipleFiles(@UploadedFiles() files: Express.Multer.File[]) {
     if (!files || files.length === 0) {

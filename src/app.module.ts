@@ -11,6 +11,7 @@ import * as path from 'path';
 import pino from 'pino';
 import { SharedModule } from './shared/shared.module';
 import { AuthModule } from './routes/auth/auth.module';
+import { CmdModule } from './routes/cmd/cmd.module';
 
 @Module({
   imports: [
@@ -44,13 +45,14 @@ import { AuthModule } from './routes/auth/auth.module';
     }),
 
     DatabaseModule,
-    
+
 
     //* Module Api
     AuthModule,
     UserModule,
     MediasModule,
     MediasV2Module,
+    CmdModule,
 
     //* Shared 
     SharedModule,
