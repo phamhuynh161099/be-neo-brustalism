@@ -13,7 +13,7 @@ export class UserController {
 
     @Get('test')
     test() {
-        return 'test'
+        return 'test 123'
     }
 
     @Post()
